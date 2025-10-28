@@ -3,18 +3,13 @@
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
-    <RootNamespace>Giacint_Flasher</RootNamespace>
+    <RootNamespace>GiacintFlasher</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
 
   <ItemGroup>
     <PackageReference Include="AdvancedSharpAdbClient" Version="3.4.14" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Lib\Data\" />
-    <Folder Include="Lib\Services\" />
   </ItemGroup>
 
 </Project>
