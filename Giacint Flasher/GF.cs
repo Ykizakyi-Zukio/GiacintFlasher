@@ -89,8 +89,7 @@ namespace GiacintFlasher
                         else
                         {
                             Console.Clear();
-                            Flasher flasher = new();
-                            flasher.WelcomeMessage();
+                            Flasher.WelcomeMessage();
                         }
                         break;
                     default:
