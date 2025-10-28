@@ -79,6 +79,7 @@ internal static class Flasher
                     break;
                 case "sc":
                 case "shortcut":
+                    var shortcutsDir = "Environment.CurrentDirectory" + "\\shortcuts\\";
                     if (fragArgs.Length < 2)
                     {
                         Debug.Warning("No shortcut subcommand provided. Use 'sc list' to view shortcuts.");
@@ -87,6 +88,7 @@ internal static class Flasher
                     switch (fragArgs[1])
                     {
                         case "create":
+                            
                             Console.WriteLine(">> SHORTCUT CREATION COMMAND, SPACE TO EXIT <<");
                             var cmd = Debug.Input();
                             if (String.IsNullOrEmpty(cmd))
@@ -96,14 +98,14 @@ internal static class Flasher
                             if (String.IsNullOrEmpty(name))
                                 break;
 
-                            if (!Directory.Exists(Environment.CurrentDirectory + "\\shortcuts\\"))
-                                Directory.CreateDirectory(Environment.CurrentDirectory + "\\shortcuts\\");
+                            if (!Directory.Exists(shortcutsDir));
+                                Directory.CreateDirectory(shortcutsDir);
                             Shortcuts.SaveShortcut(name, cmd);
                             break;
                         case "list":
-                            if (!Directory.Exists(Environment.CurrentDirectory + "\\shortcuts\\"))
+                            if (!Directory.Exists(shortcutsDir))
                                 return;
-                            Directory.GetFiles(Environment.CurrentDirectory + "\\shortcuts\\").ToList().ForEach(file =>
+                            Directory.GetFiles(shortcutsDir).ToList().ForEach(file =>
                             {
                                 Debug.Info(Path.GetFileNameWithoutExtension(file));
                             });

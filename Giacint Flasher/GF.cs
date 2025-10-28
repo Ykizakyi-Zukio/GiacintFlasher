@@ -1,7 +1,9 @@
-﻿using GiacintFlasher.Lib.Services;
-using GiacintFlasher.Lib.Data;
-using System.Runtime.InteropServices;
+﻿using GiacintFlasher.Lib.Data;
+using GiacintFlasher.Lib.Services;
+using System.Diagnostics;
 using System.IO.Compression;
+using System.Runtime.InteropServices;
+using Debug = GiacintFlasher.Lib.Services.Debug;
 
 namespace GiacintFlasher
 {
@@ -55,21 +57,30 @@ namespace GiacintFlasher
                         Debug.Info("Download completed. Extracting package...");
                         ZipFile.ExtractToDirectory(Environment.CurrentDirectory + "\\pt.zip", Environment.CurrentDirectory, true);
                         Debug.Success("Extraction completed. Cleaning up...");
-                        File.Delete(Environment.CurrentDirectory + "\\pt.zip");
+                        
                         string[] files = Directory.GetFiles(Environment.CurrentDirectory + "\\platform-tools");
 
                         Debug.Info("Moving files to current directory...");
-                        
+
+                        foreach (var name in new[] { "adb", "fastboot", "scrcpy" })
+                        {
+                            foreach (var p in Process.GetProcessesByName(name))
+                            {
+                                try { p.Kill(); p.WaitForExitAsync().Wait(); } catch { }
+                            }
+                        }
+
                         foreach (var file in files)
                         {
-                            Debug.Info($"[\\] Moving {Path.GetFileName(file)}... to {Environment.CurrentDirectory}");
+                            Debug.Info($"[\\] Moving {Path.GetFileName(file)}...");
                             string fileName = Path.GetFileName(file);
                             string destPath = Environment.CurrentDirectory + $"\\{fileName}";
 
-                            File.Move(file, destPath, overwrite: true);
+                            File.Copy(file, destPath, overwrite: true);
                         }
                         Debug.Success("Files moved. Deleting platform-tools directory...");
 
+                        File.Delete(Environment.CurrentDirectory + "\\pt.zip");
                         Directory.Delete(Environment.CurrentDirectory + "\\platform-tools", true);
 
                         Debug.Info("Package extracted and deleted");
