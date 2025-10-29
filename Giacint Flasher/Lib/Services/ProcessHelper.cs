@@ -7,6 +7,12 @@ namespace GiacintFlasher.Lib.Services
     {
         internal static async Task<string> RunCommandAsync(string fileName, string arguments)
         {
+            if (!File.Exists(Path.Combine(Environment.CurrentDirectory, $"{fileName}.exe")) && RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                Debug.Error($"{fileName} not installed!");
+                return "";
+            }
+
             var psi = new ProcessStartInfo
             {
                 FileName = fileName,
@@ -17,7 +23,6 @@ namespace GiacintFlasher.Lib.Services
                 CreateNoWindow = true
             };
 
-            // Для Linux/Mac можно явно указать shell
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
                 psi.FileName = "/bin/bash";
@@ -27,8 +32,13 @@ namespace GiacintFlasher.Lib.Services
             using var process = new Process { StartInfo = psi };
             process.Start();
 
-            string output = await process.StandardOutput.ReadToEndAsync();
             string error = await process.StandardError.ReadToEndAsync();
+            if (!string.IsNullOrEmpty(error))
+            {
+                return "[ERR] " + error;
+            }
+
+            string output = await process.StandardOutput.ReadToEndAsync();
 
             process.WaitForExit();
             int exitCode = process.ExitCode;
@@ -38,8 +48,7 @@ namespace GiacintFlasher.Lib.Services
 
             await process.WaitForExitAsync();
 
-            if (!string.IsNullOrEmpty(error))
-                output += "[ERR] " + error;
+            
 
             return output.Trim();
         }

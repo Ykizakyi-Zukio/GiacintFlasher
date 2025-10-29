@@ -2,6 +2,7 @@
 using GiacintFlasher.Lib.Data;
 using GiacintFlasher.Lib.Services;
 using System.Runtime.Serialization.Formatters;
+using System.Runtime.InteropServices;
 
 internal static class Program
 {
@@ -10,6 +11,8 @@ internal static class Program
     {
         Console.OutputEncoding = System.Text.Encoding.UTF8;
         Console.InputEncoding = System.Text.Encoding.UTF8;
+
+        Flasher.Config = Config.Load();
         Flasher.WelcomeMessage();
         Flasher.Listener();
     }
@@ -17,9 +20,11 @@ internal static class Program
 
 internal static class Flasher
 {
+    internal static Config Config = new();
+
     internal static void WelcomeMessage()
     {
-        Console.WriteLine(Color.Blue);
+        Console.WriteLine(Config.MainColor);
         Console.Write($"                      ,ood8888booo,\r\n                   ,oda8a888a888888bo,\r\n                ,od88888888aa888aa88a8bo,\r\n              ,da8888aaaa88a888aaaa8a8a88b,     Giacint Flasher - Android flashing tool\r\n             ,oa888aaaa8aa8888aaa8aa8a8a88o,    Version: V1\r\n            ,88888aaaaaa8aa8888a8aa8aa888a88,   User: {Environment.UserName}\r\n            8888a88aaaaaa8a88aa8888888a888888   Help command: gf h\r\n            888aaaa88aa8aaaa8888; ;8888a88888   OS: {Environment.OSVersion}\r\n            Y888a888a888a8888;'   ;888888a88Y   ADB Help: adb help\r\n             Y8a8aa8a888a88'      ,8aaa8888Y    Fastboot Help: fb help\r\n              Y8a8aa8aa8888;     ;8a8aaa88Y     Github: https://github.com/Ykizakyi-Zukio/GiacintFlasher\r\n               `Y88aa8888;'      ;8aaa88Y'\r\n       ,,;;;;;;;;'''''''         ;8888Y'\r\n    ,,;                         ,888P\r\n   ,;  ,;,                      ;\"\"\r\n  ;       ;          ,    ,    ,;\r\n ;  ;,    ;     ,;;;;;   ;,,,  ;\r\n;  ; ;  ,' ;  ,;      ;  ;   ;  ;\r\n; ;  ; ;  ;  '        ; ,'    ;  ;\r\n`;'  ; ;  '; ;,       ; ;      ; ',\r\n     ;  ;,  ;,;       ;  ;,     ;;;\r\n      ;,,;             ;,,;\r\n\r\n\r\n");
     }
 
@@ -62,7 +67,7 @@ internal static class Flasher
                 case "fb":
                     if (fragArgs.Length < 2)
                     {
-                        Debug.Warning("No fastboot command provided. Use 'fastboot h' for help.");
+                        Debug.Warning("No fastboot command provided. Use 'fastboot help' for help.");
                         break;
                     }
                     fragArgs[0] = "";
@@ -71,7 +76,7 @@ internal static class Flasher
                 case "adb":
                     if (fragArgs.Length < 2)
                     {
-                        Debug.Warning("No adb command provided. Use 'adb h' for help.");
+                        Debug.Warning("No adb command provided. Use 'adb help' for help.");
                         break;
                     }
                     fragArgs[0] = "";
@@ -127,6 +132,23 @@ internal static class Flasher
                             }
                             break;
                     }
+                    break;
+                case "sh":
+                    if (fragArgs.Length < 2)
+                    {
+                        Debug.Warning("No shell command provided.");
+                        break;
+                    }
+                    var shellName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "C:\\Windows\\System32\\cmd.exe" : "/bin/bash";
+                    ProcessHelper.Init(shellName, string.Join(' ', fragArgs.Skip(1).ToArray())).Wait();
+                    break;
+                case "lib":
+                    if (fragArgs.Length < 3)
+                    {
+                        Debug.Warning("No lib command provided.");
+                        break;
+                    }
+                    ProcessHelper.Init(args[1], string.Join(' ', fragArgs.Skip(2).ToArray())).Wait();
                     break;
             }
         }

@@ -31,7 +31,7 @@ namespace GiacintFlasher
 
                         break;
                     case "libs":
-                        Debug.Info("Included libraries:");
+                        Debug.Info("Included libraries, this command provide only standart libraes:");
                         foreach (var lib in libs)
                         {
                             if (File.Exists(Environment.CurrentDirectory + $"\\{lib}"))
@@ -45,9 +45,9 @@ namespace GiacintFlasher
                     case "platform-tools-install":
                     case "pt-i":
                         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                            LibInstaller.DownloadFileAsync(LibsLinks.Links["platform-tools-latest-windows.zip"], Environment.CurrentDirectory + "\\pt.zip").Wait();
+                            LibInstaller.DownloadFileAsync(Flasher.Config.Links["platform-tools-latest-windows.zip"], Environment.CurrentDirectory + "\\pt.zip").Wait();
                         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                            LibInstaller.DownloadFileAsync(LibsLinks.Links["platform-tools-latest-linux.zip"], Environment.CurrentDirectory + "\\pt.zip").Wait();
+                            LibInstaller.DownloadFileAsync(Flasher.Config.Links["platform-tools-latest-linux.zip"], Environment.CurrentDirectory + "\\pt.zip").Wait();
                         else
                         {
                             Debug.Error("Unsupported OS for platform-tools installation.");
@@ -96,6 +96,7 @@ namespace GiacintFlasher
                             Console.Clear();
                             Console.WriteLine(Color.Blue);
                             Console.Write("   |\\---/|\r\n   | ,_, |\r\n    \\_`_/-..----.\r\n ___/ `   ' ,\"\"+ \\  Giacint Flasher\r\n(__...'   __\\    |`.___.';\r\n  (_,...'(_,.`__)/'.....+\r\n\r\n\r\n");
+                            break;
                         }
                         else
                         {
@@ -103,6 +104,25 @@ namespace GiacintFlasher
                             Flasher.WelcomeMessage();
                         }
                         break;
+                    case "lib-install":
+                    case "lib-i":
+                        if (args.Length < 3) break;
+                        if (args.Length == 4) { Debug.Error("Incorrect usage of gf lib-i command."); break; }
+
+                        switch (args[3])
+                        {
+                            case "-unpkg":
+                                LibInstaller.DownloadFileAsync(args[2], Environment.CurrentDirectory + "\\lib.zip").Wait();
+                                ZipFile.ExtractToDirectory(Environment.CurrentDirectory + "\\lib.zip", Environment.CurrentDirectory, true);
+                                break;
+                            case "-asname":
+                                if (args.Length < 5) { Debug.Error("Please provide a name for the library."); break; }
+                                LibInstaller.DownloadFileAsync(args[2], Environment.CurrentDirectory + $"\\{args[5]}").Wait();
+                                break;
+                        }
+
+
+                            break;
                     default:
                         Debug.Warning("Unknown command. Use 'gf h' for help.");
                         break;
