@@ -7,6 +7,8 @@ namespace GiacintFlasher.Lib.Data
     {
         internal static JsonSerializerOptions jsonOptions = new() { WriteIndented = true };
         internal const string Version = "V1.6 Blue Wolf, Stable (PT Native)";
+
+        //JSON
         [JsonInclude]
         public string MainColor = "\u001b[38;5;75m";
         [JsonInclude]
@@ -15,6 +17,7 @@ namespace GiacintFlasher.Lib.Data
             { "platform-tools-latest-windows.zip", "https://dl.google.com/android/repository/platform-tools-latest-windows.zip" },
             { "platform-tools-latest-linux.zip", "https://dl.google.com/android/repository/platform-tools-latest-linux.zip" },
         };
+        [JsonInclude]
         public Dictionary<string, string> ShortCommands = new()
         {
             { "fb", "fastboot" },
