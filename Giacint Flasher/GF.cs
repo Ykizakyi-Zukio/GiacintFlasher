@@ -59,7 +59,7 @@ namespace GiacintFlasher
                         ZipFile.ExtractToDirectory(Environment.CurrentDirectory + "\\pt.zip", Environment.CurrentDirectory, true);
                         Debug.Success("Extraction completed. Cleaning up...");
                         
-                        string[] files = Directory.GetFiles(Environment.CurrentDirectory + "\\platform-tools");
+                        
 
                         Debug.Info("Moving files to current directory...");
 
@@ -71,14 +71,7 @@ namespace GiacintFlasher
                             }
                         }
 
-                        foreach (var file in files)
-                        {
-                            Debug.Info($"[\\] Moving {Path.GetFileName(file)}...");
-                            string fileName = Path.GetFileName(file);
-                            string destPath = Environment.CurrentDirectory + $"\\{fileName}";
-
-                            File.Copy(file, destPath, overwrite: true);
-                        }
+                        FileHelper.MoveAll(Path.Combine(Environment.CurrentDirectory, "platform-tools"), Environment.CurrentDirectory).Wait();
                         Debug.Success("Files moved. Deleting platform-tools directory...");
 
                         File.Delete(Environment.CurrentDirectory + "\\pt.zip");
@@ -108,7 +101,7 @@ namespace GiacintFlasher
                     case "lib-install":
                     case "lib-i":
                         if (args.Length < 3) break;
-                        if (args.Length == 4) { Debug.Error("Incorrect usage of gf lib-i command."); break; }
+                        //if (args.Length == 4) { Debug.Error("Incorrect usage of gf lib-i command."); break; }
 
                         switch (args[3])
                         {

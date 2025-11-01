@@ -6,7 +6,7 @@ namespace GiacintFlasher.Lib.Data
     public class Config
     {
         internal static JsonSerializerOptions jsonOptions = new() { WriteIndented = true };
-        internal const string Version = "V1.5";
+        internal const string Version = "V1.6 Blue Wolf, Stable (PT Native)";
         [JsonInclude]
         public string MainColor = "\u001b[38;5;75m";
         [JsonInclude]
