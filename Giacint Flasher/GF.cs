@@ -3,6 +3,7 @@ using GiacintFlasher.Lib.Services;
 using System.Diagnostics;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
+using System.Text.Json;
 using Debug = GiacintFlasher.Lib.Services.Debug;
 
 namespace GiacintFlasher
@@ -123,6 +124,11 @@ namespace GiacintFlasher
 
 
                             break;
+                    case "config-reset":
+                    case "cfg-r":
+                        File.WriteAllText("config.json", JsonSerializer.Serialize(new Config(), Config.jsonOptions));
+                        Debug.Success("Configuration file reset to default.");
+                        break;
                     default:
                         Debug.Warning("Unknown command. Use 'gf h' for help.");
                         break;
