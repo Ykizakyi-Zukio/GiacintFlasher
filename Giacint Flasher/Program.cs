@@ -148,7 +148,10 @@ internal static class Flasher
                         Debug.Warning("No lib command provided.");
                         break;
                     }
-                    ProcessHelper.Init(args[1], string.Join(' ', fragArgs.Skip(2).ToArray())).Wait();
+                    //if (Config.UseLibPlus)
+                        LibPlus.TryRunLib(fragArgs[1], string.Join(' ', fragArgs.Skip(2).ToArray())).Wait();
+                    //else
+                        //ProcessHelper.Init(args[1], string.Join(' ', fragArgs.Skip(2).ToArray())).Wait();
                     break;
             }
         }

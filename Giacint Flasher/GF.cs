@@ -122,6 +122,14 @@ namespace GiacintFlasher
                         File.WriteAllText("config.json", JsonSerializer.Serialize(new Config(), Config.jsonOptions));
                         Debug.Success("Configuration file reset to default.");
                         break;
+                    case "lib":
+                        if (args.Length == 3)
+                        {
+                            string? lib = LibPlus.FindLib(args[2]);
+                            if (lib != null)
+                                Debug.Success($"Lib found: {lib}");
+                        }
+                        break;
                     default:
                         Debug.Warning("Unknown command. Use 'gf h' for help.");
                         break;

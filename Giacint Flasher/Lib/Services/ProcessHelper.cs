@@ -15,12 +15,12 @@ namespace GiacintFlasher.Lib.Services
                 // Проверка существования файла для Windows
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
                 {
-                    string fullPath = Path.Combine(Environment.CurrentDirectory, $"{fileName}.exe");
-                    if (!File.Exists(fullPath))
-                    {
-                        Debug.Error($"{fileName} not found in current directory: {Environment.CurrentDirectory}");
-                        return "[ERR] Command not found";
-                    }
+                    //string fullPath = Path.Combine(Environment.CurrentDirectory, $"{fileName}.exe");
+                    //if (!File.Exists(LibPlus.FindLib(fileName)))
+                    //{
+                    //    Debug.Error($"{fileName} not found in current directory: {Environment.CurrentDirectory}");
+                    //    return "[ERR] Command not found";
+                    //}
                 }
                 else
                 {
