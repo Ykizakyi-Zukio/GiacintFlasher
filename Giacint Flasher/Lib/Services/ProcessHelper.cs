@@ -8,21 +8,20 @@ namespace GiacintFlasher.Lib.Services
     {
 
         //USED CHATGPT
-        internal static async Task<string> RunCommandAsync(string fileName, string arguments, int timeoutMs = 1000)
+        internal static async Task<string> RunCommandAsync(string fileName, string arguments, bool checkForExists = true, int timeoutMs = 1000)
         {
             try
             {
                 // Проверка существования файла для Windows
-                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && checkForExists)
                 {
-                    //string fullPath = Path.Combine(Environment.CurrentDirectory, $"{fileName}.exe");
-                    //if (!File.Exists(LibPlus.FindLib(fileName)))
-                    //{
-                    //    Debug.Error($"{fileName} not found in current directory: {Environment.CurrentDirectory}");
-                    //    return "[ERR] Command not found";
-                    //}
+                    if (LibPlus.FindLib(fileName) == null)
+                    {
+                        Debug.Error($"{fileName} not found in current directory: {Environment.CurrentDirectory}");
+                        return "[ERR] Command not found";
+                    }
                 }
-                else
+                else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && checkForExists)
                 {
                     // Проверка наличия команды в PATH на Linux/Mac
                     var whichPsi = new ProcessStartInfo

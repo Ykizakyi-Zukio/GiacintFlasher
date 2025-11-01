@@ -15,6 +15,11 @@ namespace GiacintFlasher.Lib.Data
             { "platform-tools-latest-windows.zip", "https://dl.google.com/android/repository/platform-tools-latest-windows.zip" },
             { "platform-tools-latest-linux.zip", "https://dl.google.com/android/repository/platform-tools-latest-linux.zip" },
         };
+        public Dictionary<string, string> ShortCommands = new()
+        {
+            { "fb", "fastboot" },
+            { "hd", "heimdall"}
+        };
         [JsonInclude]
         public bool UseLibPlus = true;
         [JsonInclude]

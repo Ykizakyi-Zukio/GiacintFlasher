@@ -4,6 +4,7 @@
     {
         internal static void SaveShortcut(string name, string command)
         {
+            Directory.CreateDirectory(Environment.CurrentDirectory + "\\shortcuts\\");
             File.WriteAllText(Environment.CurrentDirectory + $"\\shortcuts\\{name}.shortcut", command);
         }
 

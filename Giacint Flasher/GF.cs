@@ -32,16 +32,26 @@ namespace GiacintFlasher
 
                         break;
                     case "libs":
-                        Debug.Info("Included libraries, this command provide only standart libraes:");
-                        foreach (var lib in libs)
+                        if (!Flasher.Config.UseLibPlus)
                         {
-                            if (File.Exists(Environment.CurrentDirectory + $"\\{lib}"))
-                                Debug.Success($"{lib} WIN");
-                            else if (File.Exists(Environment.CurrentDirectory + $"\\{lib.Replace("zip", "")}"))
-                                Debug.Success($"{lib} LINUX");
-                            else
-                                Debug.Error($"{lib}");
+                            Debug.Info("Included libraries, this command provide only standart libraes, u can try Lib+ turn is on in config to view all:");
+                            foreach (var lib in libs)
+                            {
+                                if (File.Exists(Environment.CurrentDirectory + $"\\{lib}"))
+                                    Debug.Success($"{lib} WIN");
+                                else if (File.Exists(Environment.CurrentDirectory + $"\\{lib.Replace("zip", "")}"))
+                                    Debug.Success($"{lib} LINUX");
+                                else
+                                    Debug.Error($"{lib}");
+                            }
                         }
+                        else
+                        {
+                            LibPlus.AllLibs().ToList().ForEach(libPath =>
+                            {
+                                Debug.Success(Path.GetFileName(libPath));
+                            });
+                        } 
                         break;
                     case "platform-tools-install":
                     case "pt-i":
@@ -58,10 +68,6 @@ namespace GiacintFlasher
                         Debug.Info("Download completed. Extracting package...");
                         ZipFile.ExtractToDirectory(Environment.CurrentDirectory + "\\pt.zip", Environment.CurrentDirectory, true);
                         Debug.Success("Extraction completed. Cleaning up...");
-                        
-                        
-
-                        Debug.Info("Moving files to current directory...");
 
                         foreach (var name in new[] { "adb", "fastboot", "scrcpy" })
                         {
@@ -71,11 +77,7 @@ namespace GiacintFlasher
                             }
                         }
 
-                        FileHelper.MoveAll(Path.Combine(Environment.CurrentDirectory, "platform-tools"), Environment.CurrentDirectory).Wait();
-                        Debug.Success("Files moved. Deleting platform-tools directory...");
-
                         File.Delete(Environment.CurrentDirectory + "\\pt.zip");
-                        Directory.Delete(Environment.CurrentDirectory + "\\platform-tools", true);
 
                         Debug.Info("Package extracted and deleted");
                         Debug.Success("Platform-tools installed successfully.");
@@ -122,7 +124,7 @@ namespace GiacintFlasher
                         File.WriteAllText("config.json", JsonSerializer.Serialize(new Config(), Config.jsonOptions));
                         Debug.Success("Configuration file reset to default.");
                         break;
-                    case "lib":
+                    case "lib-exists":
                         if (args.Length == 3)
                         {
                             string? lib = LibPlus.FindLib(args[2]);

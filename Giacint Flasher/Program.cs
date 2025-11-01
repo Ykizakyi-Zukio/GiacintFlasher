@@ -70,8 +70,7 @@ internal static class Flasher
                         Debug.Warning("No fastboot command provided. Use 'fastboot help' for help.");
                         break;
                     }
-                    fragArgs[0] = "";
-                    ProcessHelper.Init("fastboot", fragArgs).Wait();
+                    LibPlus.TryRunLib("fastboot", string.Join(' ', fragArgs.Skip(1).ToArray())).Wait();
                     break;
                 case "adb":
                     if (fragArgs.Length < 2)
@@ -79,12 +78,11 @@ internal static class Flasher
                         Debug.Warning("No adb command provided. Use 'adb help' for help.");
                         break;
                     }
-                    fragArgs[0] = "";
-                    ProcessHelper.Init("adb", fragArgs).Wait();
+                    LibPlus.TryRunLib("adb", string.Join(' ', fragArgs.Skip(1).ToArray())).Wait();
                     break;
                 case "sc":
                 case "shortcut":
-                    var shortcutsDir = "Environment.CurrentDirectory" + "\\shortcuts\\";
+                    var shortcutsDir = $"{Environment.CurrentDirectory}\\shortcuts";
                     if (fragArgs.Length < 2)
                     {
                         Debug.Warning("No shortcut subcommand provided. Use 'sc list' to view shortcuts.");
@@ -152,6 +150,17 @@ internal static class Flasher
                         LibPlus.TryRunLib(fragArgs[1], string.Join(' ', fragArgs.Skip(2).ToArray())).Wait();
                     //else
                         //ProcessHelper.Init(args[1], string.Join(' ', fragArgs.Skip(2).ToArray())).Wait();
+                    break;
+                default:
+                    if (Config.SmartLibRunner)
+                    {
+                        if (fragArgs.Length < 2)
+                        {
+                            Debug.Warning("No lib command provided.");
+                            break;
+                        }
+                        LibPlus.TryRunLib(fragArgs[1], string.Join(' ', fragArgs)).Wait();
+                    }
                     break;
             }
         }
