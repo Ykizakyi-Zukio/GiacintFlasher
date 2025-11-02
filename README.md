@@ -1,7 +1,7 @@
 Flashing universal tool for Android devices based on .NET C# for Windows & Linux.
 
 ##NOTICE FOR LINUX
-**Check that .NET installed, launch Giacint Flasher from terminal**
+** Check that .NET installed, launch Giacint Flasher from terminal **
 
 ## Featured
 ### Auto install a google dev-kit for android (adb & fastboot), and easy update.
