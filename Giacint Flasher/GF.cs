@@ -56,9 +56,9 @@ namespace GiacintFlasher
                     case "platform-tools-install":
                     case "pt-i":
                         if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                            LibInstaller.DownloadFileAsync(Flasher.Config.Links["platform-tools-latest-windows.zip"], Environment.CurrentDirectory + "\\pt.zip").Wait();
+                            LibInstaller.DownloadFileAsync(Flasher.Config.Links["platform-tools-windows"], Environment.CurrentDirectory + "\\pt.zip").Wait();
                         else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux))
-                            LibInstaller.DownloadFileAsync(Flasher.Config.Links["platform-tools-latest-linux.zip"], Environment.CurrentDirectory + "\\pt.zip").Wait();
+                            LibInstaller.DownloadFileAsync(Flasher.Config.Links["platform-tools-linux"], Environment.CurrentDirectory + "\\pt.zip").Wait();
                         else
                         {
                             Debug.Error("Unsupported OS for platform-tools installation.");
@@ -103,6 +103,11 @@ namespace GiacintFlasher
                     case "lib-install":
                     case "lib-i":
                         if (args.Length < 4) break;
+                        if (!args[2].StartsWith("http"))
+                        {
+                            args[2] = Flasher.Config.Links[args[2]];
+                            Debug.Info($"Using link from config: {args[2]}");
+                        }
 
                         switch (args[3])
                         {
@@ -119,6 +124,14 @@ namespace GiacintFlasher
 
 
                             break;
+                    case "lib-install-list":
+                    case "lib-il":
+                        Debug.Info("Available libraries to install:");
+                        foreach (var link in Flasher.Config.Links)
+                        {
+                            Debug.Info($"{link.Key} -> {link.Value}");
+                        }
+                        break;
                     case "config-reset":
                     case "cfg-r":
                         File.WriteAllText("config.json", JsonSerializer.Serialize(new Config(), Config.jsonOptions));

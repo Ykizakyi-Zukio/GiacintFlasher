@@ -14,8 +14,13 @@ namespace GiacintFlasher.Lib.Data
         [JsonInclude]
         public Dictionary<string, string> Links = new Dictionary<string, string>()
         {
-            { "platform-tools-latest-windows.zip", "https://dl.google.com/android/repository/platform-tools-latest-windows.zip" },
-            { "platform-tools-latest-linux.zip", "https://dl.google.com/android/repository/platform-tools-latest-linux.zip" },
+            { "platform-tools-windows", "https://dl.google.com/android/repository/platform-tools-latest-windows.zip" },
+            { "platform-tools-linux", "https://dl.google.com/android/repository/platform-tools-latest-linux.zip" },
+            { "heimdall-windows", "https://bitbucket.org/benjamin_dobell/heimdall/downloads/heimdall-suite-1.4.0-win32.zip"},
+            { "heimdall-linux", "https://bitbucket.org/benjamin_dobell/heimdall/get/bb448f499c0c.zip" },
+            { "oneplus-usb-driver", "https://opfiles.b-cdn.net/OnePlus-USB-Drivers.zip" },
+            { "google-usb-driver-windows", "https://dl.google.com/android/repository/usb_driver_r13-windows.zip" },
+            { "google-usb-driver-linux", "https://dl.google.com/android/repository/usb_driver_r13-linux.zip" },
         };
         [JsonInclude]
         public Dictionary<string, string> ShortCommands = new()
