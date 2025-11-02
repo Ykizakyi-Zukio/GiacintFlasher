@@ -26,6 +26,10 @@ internal static class Flasher
     {
         Console.WriteLine(Config.MainColor);
         Console.Write($"                      ,ood8888booo,\r\n                   ,oda8a888a888888bo,\r\n                ,od88888888aa888aa88a8bo,\r\n              ,da8888aaaa88a888aaaa8a8a88b,     Giacint Flasher - Android flashing tool\r\n             ,oa888aaaa8aa8888aaa8aa8a8a88o,    Version: {Config.Version}\r\n            ,88888aaaaaa8aa8888a8aa8aa888a88,   User: {Environment.UserName}\r\n            8888a88aaaaaa8a88aa8888888a888888   Help command: gf h\r\n            888aaaa88aa8aaaa8888; ;8888a88888   OS: {Environment.OSVersion}\r\n            Y888a888a888a8888;'   ;888888a88Y   ADB Help: adb help\r\n             Y8a8aa8a888a88'      ,8aaa8888Y    Fastboot Help: fb help\r\n              Y8a8aa8aa8888;     ;8a8aaa88Y     Github: https://github.com/Ykizakyi-Zukio/GiacintFlasher\r\n               `Y88aa8888;'      ;8aaa88Y'\r\n       ,,;;;;;;;;'''''''         ;8888Y'\r\n    ,,;                         ,888P\r\n   ,;  ,;,                      ;\"\"\r\n  ;       ;          ,    ,    ,;\r\n ;  ;,    ;     ,;;;;;   ;,,,  ;\r\n;  ; ;  ,' ;  ,;      ;  ;   ;  ;\r\n; ;  ; ;  ;  '        ; ,'    ;  ;\r\n`;'  ; ;  '; ;,       ; ;      ; ',\r\n     ;  ;,  ;,;       ;  ;,     ;;;\r\n      ;,,;             ;,,;\r\n\r\n\r\n");
+        if (LibPlus.FindLib("adb") == null)
+            Debug.Warning("ADB library not found. Some commands may not work properly.");
+        if (LibPlus.FindLib("fastboot") == null)
+            Debug.Warning("Fastboot library not found. Some commands may not work properly.");
     }
 
     internal static void Listener()
@@ -62,23 +66,6 @@ internal static class Flasher
                     }
 
                     GF.Command(args);
-                    break;
-                case "fastboot":
-                case "fb":
-                    if (fragArgs.Length < 2)
-                    {
-                        Debug.Warning("No fastboot command provided. Use 'fastboot help' for help.");
-                        break;
-                    }
-                    LibPlus.TryRunLib("fastboot", string.Join(' ', fragArgs.Skip(1).ToArray())).Wait();
-                    break;
-                case "adb":
-                    if (fragArgs.Length < 2)
-                    {
-                        Debug.Warning("No adb command provided. Use 'adb help' for help.");
-                        break;
-                    }
-                    LibPlus.TryRunLib("adb", string.Join(' ', fragArgs.Skip(1).ToArray())).Wait();
                     break;
                 case "sc":
                 case "shortcut":
@@ -154,13 +141,15 @@ internal static class Flasher
                 default:
                     if (Config.SmartLibRunner)
                     {
+                        fragArgs[0] = Config.ShortCommands[fragArgs[0]] ?? fragArgs[0];
+
                         if (fragArgs.Length < 2)
                         {
                             Debug.Warning("No lib command provided.");
                             break;
                         }
-                        LibPlus.TryRunLib(fragArgs[1], string.Join(' ', fragArgs)).Wait();
-                    }
+                        LibPlus.TryRunLib(fragArgs[0], string.Join(' ', fragArgs.Skip(1).ToList())).Wait();
+    }
                     break;
             }
         }

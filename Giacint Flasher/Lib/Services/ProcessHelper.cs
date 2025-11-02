@@ -8,7 +8,7 @@ namespace GiacintFlasher.Lib.Services
     {
 
         //USED CHATGPT
-        internal static async Task<string> RunCommandAsync(string fileName, string arguments, bool checkForExists = true, int timeoutMs = 1000)
+        internal static async Task<string> RunCommandAsync(string fileName, string arguments, bool checkForExists = true, int timeoutMs = 500)
         {
             try
             {

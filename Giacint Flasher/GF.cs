@@ -102,14 +102,14 @@ namespace GiacintFlasher
                         break;
                     case "lib-install":
                     case "lib-i":
-                        if (args.Length < 3) break;
-                        //if (args.Length == 4) { Debug.Error("Incorrect usage of gf lib-i command."); break; }
+                        if (args.Length < 4) break;
 
                         switch (args[3])
                         {
                             case "-unpkg":
                                 LibInstaller.DownloadFileAsync(args[2], Environment.CurrentDirectory + "\\lib.zip").Wait();
                                 ZipFile.ExtractToDirectory(Environment.CurrentDirectory + "\\lib.zip", Environment.CurrentDirectory, true);
+                                File.Delete(Environment.CurrentDirectory + "\\lib.zip");
                                 break;
                             case "-asname":
                                 if (args.Length < 5) { Debug.Error("Please provide a name for the library."); break; }
