@@ -8,7 +8,7 @@ namespace GiacintFlasher.Lib.Services
     {
 
         //USED CHATGPT
-        internal static async Task<string> RunCommandAsync(string fileName, string arguments, bool checkForExists = true, int timeoutMs = 500)
+        internal static async Task<string> RunCommandAsync(string fileName, string arguments, bool checkForExists = true, int timeoutMs = 300, bool ignoreErrors = false)
         {
             try
             {
@@ -37,7 +37,7 @@ namespace GiacintFlasher.Lib.Services
                     using var whichProc = Process.Start(whichPsi);
                     string whichResult = await whichProc.StandardOutput.ReadToEndAsync();
                     await whichProc.WaitForExitAsync();
-                    if (string.IsNullOrWhiteSpace(whichResult))
+                    if (string.IsNullOrWhiteSpace(whichResult) && !ignoreErrors)
                     {
                         Debug.Error($"{fileName} not found in PATH");
                         return "[ERR] Command not found";
@@ -64,7 +64,7 @@ namespace GiacintFlasher.Lib.Services
                 process.OutputDataReceived += (_, e) => { if (e.Data != null) outputBuilder.AppendLine(e.Data); };
                 process.ErrorDataReceived += (_, e) => { if (e.Data != null) errorBuilder.AppendLine(e.Data); };
 
-                if (!process.Start())
+                if (!process.Start() && !ignoreErrors)
                 {
                     Debug.Error($"Failed to start process: {fileName}");
                     return "[ERR] Failed to start process";
@@ -80,21 +80,22 @@ namespace GiacintFlasher.Lib.Services
                 if (await Task.WhenAny(waitTask, timeoutTask) != waitTask)
                 {
                     try { process.Kill(true); } catch { }
-                    Debug.Error($"Process timed out after {timeoutMs} ms: {fileName}");
-                    return $"Command not exists in {fileName}";
+                    //.Debug.Error($"Process timed out after {timeoutMs} ms: {fileName}");
+                    //return $"Command not exists in {fileName}";
+                    return "";
                 }
 
                 int exitCode = process.ExitCode;
                 string output = outputBuilder.ToString().Trim();
                 string error = errorBuilder.ToString().Trim();
 
-                if (exitCode != 0)
+                if (exitCode != 0 && !ignoreErrors)
                 {
                     Debug.Error($"Process exited with code {exitCode}: {error}");
                     return $"[ERR {exitCode}] {error}";
                 }
 
-                if (!string.IsNullOrEmpty(error))
+                if (!string.IsNullOrEmpty(error) && !ignoreErrors)
                     Debug.Warning($"Process warning: {error}");
 
                 return output;

@@ -14,6 +14,12 @@ internal static class Program
 
         Flasher.Config = Config.Load();
         Flasher.WelcomeMessage();
+        if (LibPlus.FindLib("adb") != null)
+        {
+            Debug.Info("Starting adb server...");
+            _ = Task.Run(() => ProcessHelper.RunCommandAsync(LibPlus.FindLib("adb"), "start-server", false, 10000, true));
+        }    
+
         Flasher.Listener();
     }
 }
@@ -141,7 +147,10 @@ internal static class Flasher
                 default:
                     if (Config.SmartLibRunner)
                     {
-                        fragArgs[0] = Config.ShortCommands[fragArgs[0]] ?? fragArgs[0];
+                        try
+                        {
+                            fragArgs[0] = Config.ShortCommands[fragArgs[0]] ?? fragArgs[0];
+                        } catch { }
 
                         if (fragArgs.Length < 2)
                         {
@@ -149,7 +158,7 @@ internal static class Flasher
                             break;
                         }
                         LibPlus.TryRunLib(fragArgs[0], string.Join(' ', fragArgs.Skip(1).ToList())).Wait();
-    }
+                    }
                     break;
             }
         }

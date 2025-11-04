@@ -82,6 +82,11 @@ namespace GiacintFlasher
                         Debug.Info("Package extracted and deleted");
                         Debug.Success("Platform-tools installed successfully.");
 
+                        try
+                        {
+                            _ = Task.Run(() => ProcessHelper.RunCommandAsync(LibPlus.FindLib("adb"), "start-server", false, 10000, true));
+                        }
+                        catch { Debug.Warning("ADB Server not started"); }
                         break;
                     case "clear":
                     case "c":

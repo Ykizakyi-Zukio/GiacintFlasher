@@ -31,7 +31,7 @@ namespace GiacintFlasher.Lib.Data
         [JsonInclude]
         public bool UseLibPlus = true;
         [JsonInclude]
-        public bool SmartLibRunner = false;
+        public bool SmartLibRunner = true;
 
 
         internal static Config Load()
