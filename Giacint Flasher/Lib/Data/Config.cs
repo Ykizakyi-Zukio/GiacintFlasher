@@ -29,9 +29,17 @@ namespace GiacintFlasher.Lib.Data
             { "hd", "heimdall"}
         };
         [JsonInclude]
+        public Source[] LvSources =
+        [
+            new Source("APKPURE", "https://d.apkpure.com/b/APK/%com.package.name%?version=latest", true),
+
+        ];
+        [JsonInclude]
         public bool UseLibPlus = true;
         [JsonInclude]
         public bool SmartLibRunner = true;
+        [JsonInclude]
+        public float WebTimeout = 2.0f;
 
 
         internal static Config Load()

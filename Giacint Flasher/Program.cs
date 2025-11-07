@@ -144,6 +144,24 @@ internal static class Flasher
                     //else
                         //ProcessHelper.Init(args[1], string.Join(' ', fragArgs.Skip(2).ToArray())).Wait();
                     break;
+                case "lv":
+                    switch (fragArgs[1])
+                    {
+                        case "i":
+                        case "install":
+                            if (fragArgs.Length < 3)
+                            {
+                                Debug.Warning("No Livervorium package name provided.");
+                                break;
+                            }
+                            //_ = Task.Run(async() => 
+                            LV.InstallPackage(fragArgs[2]).Wait();//);
+                            break;
+                        default:
+                            Console.Write("  .---.   ,---.  ,---. \r\n  | ,_|   |   /  |   | \r\n,-./  )   |  |   |  .' \r\n\\  '_ '`) |  | _ |  |       Livervorium Manager CLI Beta\r\n > (_)  ) |  _( )_  |       Install package: lv i --[com.package.name] --..\r\n(  .  .-' \\ (_ o._) /       Params: -mkdir (installing on pc)\r\n `-'`-'|___\\ (_,_) /   \r\n  |        \\\\     /    \r\n  `--------` `---`     \r\n                        ");
+                            break;
+                    }
+                    break;
                 default:
                     if (Config.SmartLibRunner)
                     {
