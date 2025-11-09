@@ -1,5 +1,8 @@
 ﻿using GiacintFlasher.Lib.Data;
+using System;
+using System.Net;
 using System.Reflection.Metadata.Ecma335;
+using System.Text.Json;
 
 namespace GiacintFlasher.Lib.Services
 {
@@ -12,42 +15,62 @@ namespace GiacintFlasher.Lib.Services
                 var extension = source.IsXAPK ? ".xapk" : ".apk";
                 var packageLink = source.Url.Replace("%com.package.name%", packageName);
 
-                //if (!await UrlExistsAsync(packageLink))
-                //{
-                //    Debug.Error(packageLink);
-                //    continue;
-                //}
-
-                //if (!source.CleanLink)
-                //{
-                    _ = Task.Run(async () =>
+                _ = Task.Run(async () =>
+                {
+                    try
                     {
-                        try
+                        if (source.CleanLink == false)
                         {
-                            if (source.CleanLink == false)
-                            {
-                                var directLink = await GetDirectApkLinkAsync(packageLink);
-                                await LibInstaller.DownloadFileAsync(directLink, Path.Combine(Environment.CurrentDirectory, packageName + extension));
-                            }
-                                //await LibInstaller.InstallDynamic(packageLink, Path.Combine(Environment.CurrentDirectory, packageName + extension));
-                            else
-                                await LibInstaller.DownloadFileAsync(packageLink, Path.Combine(Environment.CurrentDirectory, packageName + extension));
+                            var directLink = await GetDirectApkLinkAsync(packageLink);
+                            await LibInstaller.DownloadFileAsync(directLink, Path.Combine(Environment.CurrentDirectory, packageName + extension));
                         }
-                        catch (Exception ex)
-                        {
-                            Debug.Error($"Error installing package from {source.Name}: {ex.Message}");
-                            return;
-                        }
-                        //finally
-                        //{
-                            Debug.Success($"Package {packageName} installed successfully from {source.Name}.");
-                        //}
+                        else
+                            await LibInstaller.DownloadFileAsync(packageLink, Path.Combine(Environment.CurrentDirectory, packageName + extension));
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.Error($"Error installing package from {source.Name}: {ex.Message}");
                         return;
-                    });
-                //}
+                    }
+                        
+                    Debug.Success($"Package {packageName} installed successfully from {source.Name}.");
+                        
+                    return;
+                });
             }
 
             Debug.Error($"Package {packageName} not found in any source.");
+        }
+
+
+        //internal static async Task<string> GetFdroidLatest(string packageName) => (await GetAllFdroid(packageName)).FirstOrDefault() ?? String.Empty;
+        internal static async Task<string> GetFdroidJson(string packageName)
+        {
+            string baseUrl = "https://f-droid.org/repo/";
+            string indexUrl = $"{baseUrl}index-v1.json";
+
+            using var client = new HttpClient();
+            client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0");
+
+            string json = await client.GetStringAsync(indexUrl);
+            //using var doc = JsonDocument.Parse(json);
+
+            //var result = new List<string>();
+
+            //if (!doc.RootElement.TryGetProperty("packages", out var packages)) return result;
+            //if (!packages.TryGetProperty(packageName, out var app)) return result;
+            //if (!app.TryGetProperty("versions", out var versions) || versions.ValueKind != JsonValueKind.Array) return result;
+
+            //foreach (var version in versions.EnumerateArray())
+            //{
+            //    if (version.TryGetProperty("apkName", out var apkNameProp))
+            //    {
+            //        string apkName = apkNameProp.GetString()!;
+            //        result.Add(baseUrl + apkName);
+            //    }
+            //}
+
+            return json;
         }
 
         internal static async Task<bool> UrlExistsAsync(string url)
@@ -72,47 +95,52 @@ namespace GiacintFlasher.Lib.Services
             }
         }
 
-        public static async Task<string> GetDirectApkLinkAsync(string dynamicUrl)
+        internal static async Task<string?> GetDirectApkLinkAsync(string downloadPageUrl)
         {
+            using var handler = new HttpClientHandler
+            {
+                AllowAutoRedirect = false
+            };
+            using var client = new HttpClient(handler);
+
+            // APKPure требует User-Agent и Referer
+            client.DefaultRequestHeaders.UserAgent.ParseAdd(
+                "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36");
+            client.DefaultRequestHeaders.Referrer = new Uri("https://apkpure.com/");
+
             try
             {
-                // Настраиваем HttpClient для не следования редиректам автоматически
-                using (var handler = new HttpClientHandler
-                {
-                    AllowAutoRedirect = false
-                })
-                using (var tempClient = new HttpClient(handler))
-                {
-                    // Делаем HEAD запрос для получения финального URL без загрузки файла
-                    var response = await tempClient.GetAsync(dynamicUrl, HttpCompletionOption.ResponseHeadersRead);
+                var response = await client.GetAsync(downloadPageUrl);
 
-                    // Проверяем статус редиректа (301, 302, 303, 307, 308)
-                    if ((int)response.StatusCode >= 300 && (int)response.StatusCode < 400)
+                if (response.StatusCode == HttpStatusCode.Found ||
+                    response.StatusCode == HttpStatusCode.Redirect ||
+                    response.StatusCode == HttpStatusCode.MovedPermanently)
+                {
+                    var location = response.Headers.Location;
+                    if (location != null)
                     {
-                        // Получаем финальный URL из заголовка Location
-                        var finalUrl = response.Headers.Location?.ToString();
+                        string directUrl = location.IsAbsoluteUri
+                            ? location.ToString()
+                            : new Uri(new Uri(downloadPageUrl), location).ToString();
 
-                        if (!string.IsNullOrEmpty(finalUrl))
-                        {
-                            // Если URL относительный, делаем его абсолютным
-                            if (!finalUrl.StartsWith("http"))
-                            {
-                                var baseUri = new Uri(dynamicUrl);
-                                finalUrl = new Uri(baseUri, finalUrl).ToString();
-                            }
-
-                            return finalUrl;
-                        }
+                        return directUrl;
                     }
-
-                    // Если редиректа нет, возвращаем исходный URL
-                    return dynamicUrl;
+                }
+                else if (response.StatusCode == HttpStatusCode.Forbidden)
+                {
+                    Console.WriteLine("⚠️ 493.");
+                }
+                else
+                {
+                    Console.WriteLine($"⚠️ No redirect: {response.StatusCode}");
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception($"Ошибка при получении прямой ссылки: {ex.Message}", ex);
+                Console.WriteLine("❌ Invalid url: " + ex.Message);
             }
+
+            return null;
         }
     }
 }
