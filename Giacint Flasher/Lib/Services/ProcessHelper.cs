@@ -107,8 +107,6 @@ namespace GiacintFlasher.Lib.Services
             }
         }
 
-
-
         internal static async Task Init(string processName, string[] args) => await Init(processName, string.Join(' ', args));
 
         internal static async Task Init(string processName, string arg)

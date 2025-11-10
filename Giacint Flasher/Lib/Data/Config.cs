@@ -40,6 +40,14 @@ namespace GiacintFlasher.Lib.Data
         public bool SmartLibRunner = true;
         [JsonInclude]
         public float WebTimeout = 2.0f;
+        [JsonInclude]
+        public bool DevMode = false;
+        [JsonInclude]
+        public bool FullLogging = false;
+        [JsonInclude]
+        public bool UseBetaFunctions = false;
+        [JsonInclude]
+        public bool UseLogFile = true;
 
 
         internal static Config Load()
