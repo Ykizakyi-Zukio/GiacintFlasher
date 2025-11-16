@@ -2,10 +2,30 @@
 using System;
 using System.Net;
 using System.Reflection.Metadata.Ecma335;
-using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace GiacintFlasher.Lib.Services
 {
+    public class FDroidPackageInfo
+    {
+        [JsonProperty("packageName")]
+        public string PackageName { get; set; }
+
+        [JsonProperty("suggestedVersionCode")]
+        public int SuggestedVersionCode { get; set; }
+
+        [JsonProperty("packages")]
+        public Package[] Packages { get; set; }
+    }
+
+    public class Package
+    {
+        [JsonProperty("versionName")]
+        public string VersionName { get; set; }
+
+        [JsonProperty("versionCode")]
+        public int VersionCode { get; set; }
+    }
     internal class LV
     {
         internal static async Task InstallPackage(string packageName)
@@ -42,35 +62,25 @@ namespace GiacintFlasher.Lib.Services
             Debug.Error($"Package {packageName} not found in any source.");
         }
 
-
-        //internal static async Task<string> GetFdroidLatest(string packageName) => (await GetAllFdroid(packageName)).FirstOrDefault() ?? String.Empty;
-        internal static async Task<string> GetFdroidJson(string packageName)
+        internal static async Task<FDroidPackageInfo> GetPackageInfoAsync(string packageId)
         {
-            string baseUrl = "https://f-droid.org/repo/";
-            string indexUrl = $"{baseUrl}index-v1.json";
+            using (HttpClient client = new HttpClient())
+            {
+                client.BaseAddress = new Uri("https://f-droid.org/api/v1/packages/");
+                client.DefaultRequestHeaders.Accept.Add(new System.Net.Http.Headers.MediaTypeWithQualityHeaderValue("application/json"));
 
-            using var client = new HttpClient();
-            client.DefaultRequestHeaders.UserAgent.ParseAdd("Mozilla/5.0");
-
-            string json = await client.GetStringAsync(indexUrl);
-            //using var doc = JsonDocument.Parse(json);
-
-            //var result = new List<string>();
-
-            //if (!doc.RootElement.TryGetProperty("packages", out var packages)) return result;
-            //if (!packages.TryGetProperty(packageName, out var app)) return result;
-            //if (!app.TryGetProperty("versions", out var versions) || versions.ValueKind != JsonValueKind.Array) return result;
-
-            //foreach (var version in versions.EnumerateArray())
-            //{
-            //    if (version.TryGetProperty("apkName", out var apkNameProp))
-            //    {
-            //        string apkName = apkNameProp.GetString()!;
-            //        result.Add(baseUrl + apkName);
-            //    }
-            //}
-
-            return json;
+                HttpResponseMessage response = await client.GetAsync(packageId);
+                if (response.IsSuccessStatusCode)
+                {
+                    string json = await response.Content.ReadAsStringAsync();
+                    FDroidPackageInfo packageInfo = JsonConvert.DeserializeObject<FDroidPackageInfo>(json);
+                    return packageInfo;
+                }
+                else
+                {
+                    throw new Exception($"Ошибка API: {response.StatusCode}");
+                }
+            }
         }
 
         internal static async Task<bool> UrlExistsAsync(string url)
@@ -142,5 +152,7 @@ namespace GiacintFlasher.Lib.Services
 
             return null;
         }
+
+        internal static string GetFdroidPackageUrl(string packageName, int versionCode) => $"https://f-droid.org/repo/{packageName}_{versionCode}.apk";
     }
 }

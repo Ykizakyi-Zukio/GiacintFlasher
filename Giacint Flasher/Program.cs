@@ -4,9 +4,10 @@ using GiacintFlasher.Lib.Services;
 using System.Runtime.Serialization.Formatters;
 using System.Runtime.InteropServices;
 using System.Text.Json.Serialization;
-using System.Text.Json;
+//using System.Text.Json;
 //using System.Diagnostics;
 using System.Xml;
+using Newtonsoft.Json;
 
 internal static class Program
 {
@@ -66,7 +67,7 @@ internal static class Flasher
                 Debug.Info($"[DEV MODE] Command received: {command}");
                 Debug.Info($"[DEV MODE] Args count: {args.Length}");
                 Debug.Info($"[DEV MODE] Args: {string.Join(", ", args)}");
-                Debug.Info($"[DEV MODE] Withount prefix: {JsonSerializer.Serialize(args.Skip(1).ToList())}");
+                Debug.Info($"[DEV MODE] Withount prefix: {JsonConvert.SerializeObject(args.Skip(1).ToList())}");
             }
 
             Span<string> frags = command.Split(">>");
@@ -189,23 +190,96 @@ internal static class Flasher
                                     Debug.Error($"Error getting direct link: {ex.Message}");
                                 }
                                 break;
-                            case "fd":
+                            case "fd-info":
                                 try
                                 {
-                                    var link = LV.GetFdroidJson(fragArgs[2]).Result;
-                                    Debug.Info(link);
-                                    //LibInstaller.DownloadFileAsync(link, Path.Combine(Environment.CurrentDirectory, fragArgs[2] + ".apk")).Wait();
-
-                                    if (link != null)
-                                        Debug.Info(link);
-                                    else
-                                        Debug.Warning("Package not found on F-Droid.");
+                                    var link = LV.GetPackageInfoAsync(fragArgs[2]).Result;
+                                    if (link != null) Debug.Info(JsonConvert.SerializeObject(link));
                                 }
                                 catch (Exception ex)
                                 {
                                     Debug.Error($"Error getting F-Droid link: {ex.Message}");
                                 }
                                 break;
+                            case "fdl":
+                            case "fd-latest":
+                                if (fragArgs.Length < 3)
+                                {
+                                    Debug.Warning("No F-Droid package name provided.");
+                                    break;
+                                }
+
+                                try
+                                {
+                                    var info = LV.GetPackageInfoAsync(fragArgs[2]).Result;
+                                    Package latestPackage = Array.Find(info.Packages, p => p.VersionCode == info.SuggestedVersionCode);
+                                    Directory.CreateDirectory($"{Environment.CurrentDirectory}\\packages\\fdroid\\");
+                                    LibInstaller.DownloadFileAsync(LV.GetFdroidPackageUrl(info.PackageName, latestPackage.VersionCode), Path.Combine(Environment.CurrentDirectory, $"packages\\fdroid\\{info.PackageName}_{latestPackage.VersionCode}.apk")).Wait();
+
+                                    if (fragArgs.Length == 4 && fragArgs[3] == "--onphone")
+                                    {
+                                        Debug.Info("Installing package on connected device...");
+                                        LibPlus.TryRunLib("adb", $"install -r -g -t \"{Path.Combine(Environment.CurrentDirectory, $"packages\\fdroid\\{info.PackageName}_{latestPackage.VersionCode}.apk")}\"", 5000).Wait();
+                                        Debug.Success($"{info.PackageName}_{latestPackage.VersionName}.apk");
+                                    }
+                                }
+                                catch (Exception ex)
+                                {
+                                    Debug.Error($"Error getting F-Droid latest link: {ex.Message}");
+                                }
+                                break;
+                            //case "fdm":
+                            //case "fd-manual":
+                            //    try
+                            //    {
+                            //        int version = 0;
+                            //        FDroidPackageInfo infoManual;
+
+                            //        if (fragArgs.Length >= 3)
+                            //            infoManual = LV.GetPackageInfoAsync(fragArgs[2]).Result;
+                            //        else
+                            //            break;
+                            //        if (fragArgs.Length < 4)
+                            //        {
+                            //            if (fragArgs.Length < 3)
+                            //                Debug.Warning("No F-Droid package name provided.");
+                            //            else
+                            //            {
+                            //                foreach (var pkg in infoManual.Packages)
+                            //                {
+                            //                    Debug.Info($"Version Name: {pkg.VersionName} | Version Code: {pkg.VersionCode}");
+                            //                }
+                            //                Debug.Info("No version code provided. Please enter version code:");
+                            //                version = int.Parse(Debug.Input());
+                            //            }
+                            //            //break;
+                            //        }
+                            //        else if (fragArgs[3] != "--onphone")
+                            //        {
+                            //            version = int.Parse(fragArgs[3]);
+                            //        }
+                            //        if (version == 0)
+                            //        {
+                            //            Debug.Warning("No version code provided.");
+                            //            break;
+                            //        }
+
+                            //        version = int.Parse(fragArgs[3]);
+                            //        Directory.CreateDirectory($"{Environment.CurrentDirectory}\\packages\\fdroid\\");
+                            //        LibInstaller.DownloadFileAsync(LV.GetFdroidPackageUrl(infoManual.PackageName, int.Parse(fragArgs[3])), Path.Combine(Environment.CurrentDirectory, $"packages\\fdroid\\{infoManual.PackageName}_{version}.apk")).Wait();
+
+                            //        if (fragArgs.Length == 4 && fragArgs[3] == "--onphone")
+                            //        {
+                            //            Debug.Info("Installing package on connected device...");
+                            //            LibPlus.TryRunLib("adb", $"install -r -g -t \"{Path.Combine(Environment.CurrentDirectory, $"packages\\fdroid\\{infoManual.PackageName}_{version}.apk")}\"", 5000).Wait();
+                            //            Debug.Success($"{infoManual.PackageName}_{version}.apk");
+                            //        }
+                            //    }
+                            //    catch (Exception ex)
+                            //    {
+                            //        Debug.Error($"Error getting F-Droid latest link: {ex.Message}");
+                            //    }
+                            //    break;
                             default:
                                 Console.Write("  .---.   ,---.  ,---. \r\n  | ,_|   |   /  |   | \r\n,-./  )   |  |   |  .' \r\n\\  '_ '`) |  | _ |  |       Livervorium Manager CLI Beta\r\n > (_)  ) |  _( )_  |       Install package: lv i --[com.package.name] --..\r\n(  .  .-' \\ (_ o._) /       Params: -mkdir (installing on pc)\r\n `-'`-'|___\\ (_,_) /     From Fdroid: lv fd --[com.package.name]\r\n  |        \\\\     /    \r\n  `--------` `---`     \r\n                        ");
                                 break;

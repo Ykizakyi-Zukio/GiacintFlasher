@@ -12,7 +12,11 @@ namespace GiacintFlasher.Lib.Services
         {
             try
             {
-                // Проверка существования файла для Windows
+                if (Flasher.Config.FullLogging && !ignoreErrors)
+                {
+                    Debug.Info($"Running command: {fileName} {arguments}");
+                }
+
                 if (RuntimeInformation.IsOSPlatform(OSPlatform.Windows) && checkForExists)
                 {
                     if (LibPlus.FindLib(fileName) == null)
@@ -23,7 +27,6 @@ namespace GiacintFlasher.Lib.Services
                 }
                 else if (RuntimeInformation.IsOSPlatform(OSPlatform.Linux) && checkForExists)
                 {
-                    // Проверка наличия команды в PATH на Linux/Mac
                     var whichPsi = new ProcessStartInfo
                     {
                         FileName = "which",
@@ -73,14 +76,14 @@ namespace GiacintFlasher.Lib.Services
                 process.BeginOutputReadLine();
                 process.BeginErrorReadLine();
 
-                // Тайм-аут через Task.WhenAny
                 var waitTask = process.WaitForExitAsync();
                 var timeoutTask = Task.Delay(timeoutMs);
 
                 if (await Task.WhenAny(waitTask, timeoutTask) != waitTask)
                 {
                     try { process.Kill(true); } catch { }
-                    //.Debug.Error($"Process timed out after {timeoutMs} ms: {fileName}");
+                    if (Flasher.Config.FullLogging)
+                        Debug.Error($"Process timed out after {timeoutMs} ms: {fileName}\r\nAT: {fileName} {arguments}");
                     //return $"Command not exists in {fileName}";
                     return "";
                 }

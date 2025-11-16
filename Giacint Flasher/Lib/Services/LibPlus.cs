@@ -29,13 +29,13 @@ namespace GiacintFlasher.Lib.Services
             return null;
         }
 
-        internal static async Task TryRunLib(string libName, string args)
+        internal static async Task TryRunLib(string libName, string args, int timeoutMs = 300, bool ignoreErrors = false)
         {
             try
             {
                 var libPath = FindLib(libName);
                 if (libPath == null) {Debug.Warning("This library not exists"); return; }
-                string result = await ProcessHelper.RunCommandAsync(libPath, args, false);
+                string result = await ProcessHelper.RunCommandAsync(libPath, args, false, timeoutMs, ignoreErrors);
                 Debug.Info(result);
             }
             catch (Exception ex)
