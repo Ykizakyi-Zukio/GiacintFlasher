@@ -6,7 +6,23 @@
     <RootNamespace>GiacintFlasher</RootNamespace>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <Authors>Ykizakyi Zukio</Authors>
+    <Company>Team Giacint</Company>
+    <Copyright>GPL v3</Copyright>
+    <PackageIcon>CHJJWLi.jpg</PackageIcon>
+    <ApplicationIcon>CHJJWLi.ico</ApplicationIcon>
   </PropertyGroup>
+
+  <ItemGroup>
+    <Content Include="CHJJWLi.ico" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\..\..\Downloads\CHJJWLi.jpg">
+      <Pack>True</Pack>
+      <PackagePath>\</PackagePath>
+    </None>
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Newtonsoft.Json" Version="13.0.4" />
