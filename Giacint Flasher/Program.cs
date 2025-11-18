@@ -150,17 +150,6 @@ internal static class Flasher
                                 break;
                         }
                         break;
-                    //case "sh":
-                    //    if (fragArgs.Length < 2)
-                    //    {
-                    //        Debug.Warning("No shell command provided.");
-                    //        break;
-                    //    }
-                    //    var shellName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
-                    //        ? "cmd.exe"
-                    //        : "/bin/bash";
-                    //    _ = Task.Run( async() => Debug.Info(await ProcessHelper.RunCommandAsync(shellName, string.Join(' ', fragArgs.Skip(1).ToArray()), false, 3000)));
-                    //    break;
                     case "lib":
                         if (fragArgs.Length < 3)
                         {
@@ -242,58 +231,6 @@ internal static class Flasher
                                     Debug.Error($"Error getting F-Droid latest link: {ex.Message}");
                                 }
                                 break;
-                            //case "fdm":
-                            //case "fd-manual":
-                            //    try
-                            //    {
-                            //        int version = 0;
-                            //        FDroidPackageInfo infoManual;
-
-                            //        if (fragArgs.Length >= 3)
-                            //            infoManual = LV.GetPackageInfoAsync(fragArgs[2]).Result;
-                            //        else
-                            //            break;
-                            //        if (fragArgs.Length < 4)
-                            //        {
-                            //            if (fragArgs.Length < 3)
-                            //                Debug.Warning("No F-Droid package name provided.");
-                            //            else
-                            //            {
-                            //                foreach (var pkg in infoManual.Packages)
-                            //                {
-                            //                    Debug.Info($"Version Name: {pkg.VersionName} | Version Code: {pkg.VersionCode}");
-                            //                }
-                            //                Debug.Info("No version code provided. Please enter version code:");
-                            //                version = int.Parse(Debug.Input());
-                            //            }
-                            //            //break;
-                            //        }
-                            //        else if (fragArgs[3] != "--onphone")
-                            //        {
-                            //            version = int.Parse(fragArgs[3]);
-                            //        }
-                            //        if (version == 0)
-                            //        {
-                            //            Debug.Warning("No version code provided.");
-                            //            break;
-                            //        }
-
-                            //        version = int.Parse(fragArgs[3]);
-                            //        Directory.CreateDirectory($"{Environment.CurrentDirectory}\\packages\\fdroid\\");
-                            //        LibInstaller.DownloadFileAsync(LV.GetFdroidPackageUrl(infoManual.PackageName, int.Parse(fragArgs[3])), Path.Combine(Environment.CurrentDirectory, $"packages\\fdroid\\{infoManual.PackageName}_{version}.apk")).Wait();
-
-                            //        if (fragArgs.Length == 4 && fragArgs[3] == "--onphone")
-                            //        {
-                            //            Debug.Info("Installing package on connected device...");
-                            //            LibPlus.TryRunLib("adb", $"install -r -g -t \"{Path.Combine(Environment.CurrentDirectory, $"packages\\fdroid\\{infoManual.PackageName}_{version}.apk")}\"", 5000).Wait();
-                            //            Debug.Success($"{infoManual.PackageName}_{version}.apk");
-                            //        }
-                            //    }
-                            //    catch (Exception ex)
-                            //    {
-                            //        Debug.Error($"Error getting F-Droid latest link: {ex.Message}");
-                            //    }
-                            //    break;
                             default:
                                 Console.Write("  .---.   ,---.  ,---. \r\n  | ,_|   |   /  |   | \r\n,-./  )   |  |   |  .' \r\n\\  '_ '`) |  | _ |  |       Livervorium Manager CLI Beta\r\n > (_)  ) |  _( )_  |       Install package: lv i --[com.package.name] --..\r\n(  .  .-' \\ (_ o._) /       Params: -mkdir (installing on pc)\r\n `-'`-'|___\\ (_,_) /     From Fdroid: lv fd --[com.package.name]\r\n  |        \\\\     /    \r\n  `--------` `---`     \r\n                        ");
                                 break;
