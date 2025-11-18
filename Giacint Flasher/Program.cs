@@ -25,6 +25,17 @@ internal static class Program
             _ = Task.Run(() => ProcessHelper.RunCommandAsync(LibPlus.FindLib("adb"), "start-server", false, 10000, true));
         }    
 
+        if (!string.IsNullOrEmpty(Flasher.Config.RunShortcutInStartup))
+        {
+            try
+            {
+                Shortcuts.InitShortcut(Flasher.Config.RunShortcutInStartup);
+            }
+            catch
+            {
+                Debug.Warning("Startup shortcut can`t to init.");
+            }
+        }   
         Flasher.Listener();
     }
 }
