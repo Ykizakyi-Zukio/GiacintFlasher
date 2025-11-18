@@ -10,7 +10,7 @@ namespace GiacintFlasher
 {
     internal static class GF
     {
-        static string[] libs = new string[]
+        static string[] libs =
         {
             "adb.exe",
             "fastboot.exe",
@@ -18,7 +18,8 @@ namespace GiacintFlasher
             "7z.exe",
             "AdbWinApi.dll",
             "img2simg.exe",
-            "simg2img.exe"
+            "simg2img.exe",
+            "heimdall.exe",
         };
 
         internal static void Command(string[] args)

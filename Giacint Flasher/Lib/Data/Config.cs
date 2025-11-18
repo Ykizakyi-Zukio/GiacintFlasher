@@ -6,11 +6,12 @@ namespace GiacintFlasher.Lib.Data
     public class Config
     {
         internal static JsonSerializerOptions jsonOptions = new() { WriteIndented = true };
-        internal const string Version = "V1.8 Blue Wolf, Stable";
+        internal const string Version = "V2.0 Lavanda Eagle, Stable";
+        internal const string DefaultMessage = "         .   ,\r\n       '. '.  \\  \\\r\n      ._ '-.'. `\\  \\\r\n        '-._; .'; `-.'. \r\n       `~-.; '.       '.\r\n        '--,`           '.\r\n           -='.          ;           %appName%\r\n .--=~~=-,    -.;        ;           %appVersion%\r\n .-=`;    `~,_.;        /            %appAuthor%\r\n`  ,-`'    .-;         |             %appRepo%\r\n   .-~`.    .;         ;\r\n    .;.-   .-;         ,\\\r\n      `.'   ,=;     .-'  `~.-._\r\n       .';   .';  .'      .'   '-.\r\n         .\\  ;  ;        ,.' _  a',\r\n        .'~\";-`   ;      ;\"~` `'-=.)\r\n      .' .'   . _;  ;',  ;\r\n      '-.._`~`.'  \\  ; ; :\r\n           `~'    _'\\\\_ \\\\_ \r\n                 /=`^^=`\"\"/`)-.\r\n                 \\ =  _ =     =\\\r\n                  `\"\"` `~-. =   ;\r\n\r\n";
 
         //JSON
         [JsonInclude]
-        public string MainColor = "\u001b[38;5;75m";
+        public string MainColor = "\\u001b[38;5;218m\r\n";
         [JsonInclude]
         public Dictionary<string, string> Links = new Dictionary<string, string>()
         {
@@ -48,7 +49,18 @@ namespace GiacintFlasher.Lib.Data
         public bool UseBetaFunctions = false;
         [JsonInclude]
         public bool UseLogFile = true;
-
+        [JsonInclude]
+        public string CurrentWelcomeMessage = "default.msg";
+        [JsonInclude]
+        public Dictionary<string, string> AppContexts = new()
+        {
+            { "%appName%", "Giacint Flasher" },
+            { "%appVersion%", Version },
+            { "%appAuthor%", "Ykizakyi Zukio" },
+            { "%appRepo%", "https://github.com/Ykizakyi-Zukio/GiacintFlasher" },
+            { "%appReleases%", "https://github.com/Ykizakyi-Zukio/GiacintFlasher/releases" },
+            { "%appPlatform%", Environment.OSVersion.Platform.ToString()}
+        };
 
         internal static Config Load()
         {
