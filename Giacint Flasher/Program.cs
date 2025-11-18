@@ -47,7 +47,7 @@ internal static class Flasher
             wm = Config.DefaultMessage;
 
         Console.WriteLine(Config.MainColor);
-        Console.Write(StringHelper.ReplaceContexts(Flasher.Config.AppContexts, Config.DefaultMessage));
+        Console.Write(StringHelper.ReplaceContexts(Config.AppContexts, Config.DefaultMessage));
         if (LibPlus.FindLib("adb") == null)
             Debug.Warning("ADB library not found. Some commands may not work properly.");
         if (LibPlus.FindLib("fastboot") == null)
@@ -150,15 +150,17 @@ internal static class Flasher
                                 break;
                         }
                         break;
-                    case "sh":
-                        if (fragArgs.Length < 2)
-                        {
-                            Debug.Warning("No shell command provided.");
-                            break;
-                        }
-                        var shellName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows) ? "C:\\Windows\\System32\\cmd.exe" : "/bin/bash";
-                        ProcessHelper.Init(shellName, string.Join(' ', fragArgs.Skip(1).ToArray())).Wait();
-                        break;
+                    //case "sh":
+                    //    if (fragArgs.Length < 2)
+                    //    {
+                    //        Debug.Warning("No shell command provided.");
+                    //        break;
+                    //    }
+                    //    var shellName = RuntimeInformation.IsOSPlatform(OSPlatform.Windows)
+                    //        ? "cmd.exe"
+                    //        : "/bin/bash";
+                    //    _ = Task.Run( async() => Debug.Info(await ProcessHelper.RunCommandAsync(shellName, string.Join(' ', fragArgs.Skip(1).ToArray()), false, 3000)));
+                    //    break;
                     case "lib":
                         if (fragArgs.Length < 3)
                         {

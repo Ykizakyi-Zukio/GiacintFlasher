@@ -51,8 +51,8 @@ namespace GiacintFlasher.Lib.Data
         public bool UseLogFile = true;
         [JsonInclude]
         public string CurrentWelcomeMessage = "default.msg";
-        [JsonInclude]
-        public Dictionary<string, string> AppContexts = new()
+        //[JsonInclude]
+        public static Dictionary<string, string> AppContexts = new()
         {
             { "%appName%", "Giacint Flasher" },
             { "%appVersion%", Version },
