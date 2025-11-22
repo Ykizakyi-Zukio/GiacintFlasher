@@ -1,9 +1,9 @@
 ﻿using GiacintFlasher.Lib.Data;
 using GiacintFlasher.Lib.Services;
+using Newtonsoft.Json;
 using System.Diagnostics;
 using System.IO.Compression;
 using System.Runtime.InteropServices;
-using System.Text.Json;
 using Debug = GiacintFlasher.Lib.Services.Debug;
 
 namespace GiacintFlasher
@@ -140,7 +140,7 @@ namespace GiacintFlasher
                         break;
                     case "config-reset":
                     case "cfg-r":
-                        File.WriteAllText("config.json", JsonSerializer.Serialize(new Config(), Config.jsonOptions));
+                        File.WriteAllText("config.json", new Config().ToJson());
                         Debug.Success("Configuration file reset to default.");
                         break;
                     case "lib-exists":

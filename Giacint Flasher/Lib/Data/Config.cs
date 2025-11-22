@@ -1,11 +1,9 @@
-﻿using System.Text.Json;
-using System.Text.Json.Serialization;
+﻿using Newtonsoft.Json;
 
 namespace GiacintFlasher.Lib.Data
 {
     public class Config
     {
-        internal static JsonSerializerOptions jsonOptions = new() { WriteIndented = true };
         internal const string Version = "V2.0 Lavanda Eagle, Stable";
         internal const string DefaultMessage = "         .   ,\r\n       '. '.  \\  \\\r\n      ._ '-.'. `\\  \\\r\n        '-._; .'; `-.'. \r\n       `~-.; '.       '.\r\n        '--,`           '.\r\n           -='.          ;           %appName%\r\n .--=~~=-,    -.;        ;           %appVersion%\r\n .-=`;    `~,_.;        /            %appAuthor%\r\n`  ,-`'    .-;         |             %appRepo%\r\n   .-~`.    .;         ;\r\n    .;.-   .-;         ,\\\r\n      `.'   ,=;     .-'  `~.-._\r\n       .';   .';  .'      .'   '-.\r\n         .\\  ;  ;        ,.' _  a',\r\n        .'~\";-`   ;      ;\"~` `'-=.)\r\n      .' .'   . _;  ;',  ;\r\n      '-.._`~`.'  \\  ; ; :\r\n           `~'    _'\\\\_ \\\\_ \r\n                 /=`^^=`\"\"/`)-.\r\n                 \\ =  _ =     =\\\r\n                  `\"\"` `~-. =   ;\r\n\r\n";
         internal static Dictionary<string, string> AppContexts = new()
@@ -15,13 +13,14 @@ namespace GiacintFlasher.Lib.Data
             { "%appAuthor%", "Ykizakyi Zukio" },
             { "%appRepo%", "https://github.com/Ykizakyi-Zukio/GiacintFlasher" },
             { "%appReleases%", "https://github.com/Ykizakyi-Zukio/GiacintFlasher/releases" },
-            { "%appPlatform%", Environment.OSVersion.Platform.ToString()}
+            { "%appPlatform%", Environment.OSVersion.Platform.ToString()},
+            { "%appUser%", Environment.UserName },
         };
 
         //JSON
-        [JsonInclude]
-        public string MainColor = "\\u001b[38;5;218m\r\n";
-        [JsonInclude]
+        [JsonRequired]
+        public string MainColor = "\u001b[38;5;218m";
+        [JsonRequired]
         public Dictionary<string, string> Links = new Dictionary<string, string>()
         {
             { "platform-tools-windows", "https://dl.google.com/android/repository/platform-tools-latest-windows.zip" },
@@ -32,39 +31,39 @@ namespace GiacintFlasher.Lib.Data
             { "google-usb-driver-windows", "https://dl.google.com/android/repository/usb_driver_r13-windows.zip" },
             { "google-usb-driver-linux", "https://dl.google.com/android/repository/usb_driver_r13-linux.zip" },
         };
-        [JsonInclude]
+        [JsonRequired]
         public Dictionary<string, string> ShortCommands = new()
         {
             { "fb", "fastboot" },
             { "hd", "heimdall"}
         };
-        [JsonInclude]
+        [JsonRequired]
         public Source[] LvSources = [];
-        [JsonInclude]
+        [JsonRequired]
         public bool UseLibPlus = true;
-        [JsonInclude]
+        [JsonRequired]
         public bool SmartLibRunner = true;
-        [JsonInclude]
+        [JsonRequired]
         public float WebTimeout = 2.0f;
-        [JsonInclude]
+        [JsonRequired]
         public bool DevMode = false;
-        [JsonInclude]
+        [JsonRequired]
         public bool FullLogging = false;
-        [JsonInclude]
+        [JsonRequired]
         public bool UseBetaFunctions = false;
-        [JsonInclude]
+        [JsonRequired]
         public bool UseLogFile = true;
-        [JsonInclude]
+        [JsonRequired]
         public string CurrentWelcomeMessage = "default.msg";
-        [JsonInclude]
+        [JsonRequired]
         public string RunShortcutInStartup = "";
 
         internal static Config Load()
         {
             if (!File.Exists("config.json"))
-                File.WriteAllText("config.json", JsonSerializer.Serialize(new Config(), jsonOptions));
-            return JsonSerializer.Deserialize<Config>(File.ReadAllText("config.json"));
+                File.WriteAllText("config.json", JsonConvert.SerializeObject(new Config(), Formatting.Indented));
+            return JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"));
         }
-        internal string ToJson() => JsonSerializer.Serialize(this, jsonOptions);
+        internal string ToJson() => JsonConvert.SerializeObject(this, Formatting.Indented);
     }
 }

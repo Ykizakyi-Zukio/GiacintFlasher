@@ -31,5 +31,8 @@
                 return text;
             }
         }
+
+        internal static string ParseArg(string[] args, int index) => String.Join("", args.Skip(index));
+        
     }
 }

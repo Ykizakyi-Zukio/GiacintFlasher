@@ -55,10 +55,13 @@ internal static class Flasher
         if (File.Exists($"{Environment.CurrentDirectory}\\wms\\{Config.CurrentWelcomeMessage}"))
             wm = File.ReadAllText($"{Environment.CurrentDirectory}\\wms\\{Config.CurrentWelcomeMessage}");
         else
+        {
+            Debug.Error($"Welcome message file not found, loading default welcome message. {Environment.CurrentDirectory}\\wms\\{Config.CurrentWelcomeMessage}");
             wm = Config.DefaultMessage;
+        }
 
         Console.WriteLine(Config.MainColor);
-        Console.Write(StringHelper.ReplaceContexts(Config.AppContexts, Config.DefaultMessage));
+        Console.Write(StringHelper.ReplaceContexts(Config.AppContexts, wm));
         if (LibPlus.FindLib("adb") == null)
             Debug.Warning("ADB library not found. Some commands may not work properly.");
         if (LibPlus.FindLib("fastboot") == null)
@@ -142,6 +145,30 @@ internal static class Flasher
                                 {
                                     Debug.Info(Path.GetFileNameWithoutExtension(file));
                                 });
+                                break;
+                            case "$framework":
+                                if (string.IsNullOrEmpty(fragArgs[2])) break;
+                                switch (fragArgs[2])
+                                {
+                                    case "debug-info":
+                                        Debug.Info(StringHelper.ParseArg(fragArgs, 3));
+                                        break;
+                                    case "debug-warn":
+                                        Debug.Warning(StringHelper.ParseArg(fragArgs, 3));
+                                        break;
+                                    case "debug-error":
+                                        Debug.Error(StringHelper.ParseArg(fragArgs, 3));
+                                        break;
+                                    case "thread-sleep":
+                                        Thread.Sleep(int.Parse(args[3]));
+                                        break;
+                                    case "libplus-tryrunlib":
+                                        LibPlus.TryRunLib(fragArgs[3], StringHelper.ParseArg(fragArgs, 4), ignoreErrors: true).Wait();
+                                        break;
+                                    case "libplus-tryrunlib@async":
+                                        _ = Task.Run(async () => { await LibPlus.TryRunLib(fragArgs[3], StringHelper.ParseArg(fragArgs, 4), ignoreErrors: true); });
+                                        break;
+                                }
                                 break;
                             default:
                                 try
