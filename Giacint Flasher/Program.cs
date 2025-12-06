@@ -1,12 +1,6 @@
 ﻿using GiacintFlasher;
 using GiacintFlasher.Lib.Data;
 using GiacintFlasher.Lib.Services;
-using System.Runtime.Serialization.Formatters;
-using System.Runtime.InteropServices;
-using System.Text.Json.Serialization;
-//using System.Text.Json;
-//using System.Diagnostics;
-using System.Xml;
 using Newtonsoft.Json;
 
 internal static class Program
@@ -35,7 +29,11 @@ internal static class Program
             {
                 Debug.Warning("Startup shortcut can`t to init.");
             }
-        }   
+        }
+        
+        Directory.CreateDirectory($"{Environment.CurrentDirectory}\\libraries");
+        Directory.CreateDirectory($"{Environment.CurrentDirectory}\\user");
+
         Flasher.Listener();
     }
 }
@@ -160,7 +158,7 @@ internal static class Flasher
                                         Debug.Error(StringHelper.ParseArg(fragArgs, 3));
                                         break;
                                     case "thread-sleep":
-                                        Thread.Sleep(int.Parse(args[3]));
+                                        Thread.Sleep(int.Parse(fragArgs[3]));
                                         break;
                                     case "libplus-tryrunlib":
                                         LibPlus.TryRunLib(fragArgs[3], StringHelper.ParseArg(fragArgs, 4), ignoreErrors: true).Wait();
@@ -180,9 +178,11 @@ internal static class Flasher
                                     }
                                     Shortcuts.InitShortcut(fragArgs[1].Trim());
                                 }
-                                catch
+                                catch (Exception e)
                                 {
                                     Debug.Error("Shortcut can`t to init.");
+                                    if (Config.FullLogging)
+                                        Debug.Error(e);
                                     break;
                                 }
                                 break;
@@ -271,6 +271,51 @@ internal static class Flasher
                                 break;
                             default:
                                 Console.Write("  .---.   ,---.  ,---. \r\n  | ,_|   |   /  |   | \r\n,-./  )   |  |   |  .' \r\n\\  '_ '`) |  | _ |  |       Livervorium Manager CLI Beta\r\n > (_)  ) |  _( )_  |       Install package: lv i --[com.package.name] --..\r\n(  .  .-' \\ (_ o._) /       Params: -mkdir (installing on pc)\r\n `-'`-'|___\\ (_,_) /     From Fdroid: lv fd --[com.package.name]\r\n  |        \\\\     /    \r\n  `--------` `---`     \r\n                        ");
+                                break;
+                        }
+                        break;
+                    case "sf":
+                        if (fragArgs.Length < 2)
+                        {
+                            Debug.Warning("No smart flash command provided.");
+                            break;
+                        }
+                        switch (fragArgs[1])
+                        {
+                            //case "disable-apps":
+                            //    if (fragArgs.Length < 3) { Debug.Warning("No provided app list"); break; }
+                            //    if (!File.Exists($"{Environment.CurrentDirectory}\\user\\applists\\{fragArgs[2]}.json"))
+
+                            //        break;
+                            case "applist":
+                                Directory.CreateDirectory($"{Environment.CurrentDirectory}\\user\\applists");
+                                if (fragArgs.Length < 4) { Debug.Warning("No provided app list"); break; }
+
+                                var listPath = $"{Environment.CurrentDirectory}\\user\\applists\\{fragArgs[2]}.applist";
+                                if (!File.Exists(listPath)) { Debug.Warning("No provided app list"); break; }
+
+                                string cmd;
+                                string[] apps = File.ReadAllLines(listPath);
+                                switch (args[3])
+                                {
+                                    case "del":
+                                    case "delete":
+                                        cmd = "uninstall -k --user 0";
+                                        break;
+                                    case "dis":
+                                    case "disable":
+                                        cmd = "disable-user --user 0";
+                                        break;
+                                    case "enl":
+                                    case "enable":
+                                        cmd = "enable";
+                                        break;
+                                    default:
+                                        Debug.Error("Not provided cmd for app list");
+                                        return;
+                                }
+
+                                SF.OperandAppList(cmd, apps);
                                 break;
                         }
                         break;

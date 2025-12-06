@@ -67,7 +67,7 @@ namespace GiacintFlasher
                         }
 
                         Debug.Info("Download completed. Extracting package...");
-                        ZipFile.ExtractToDirectory(Environment.CurrentDirectory + "\\pt.zip", Environment.CurrentDirectory, true);
+                        ZipFile.ExtractToDirectory(Environment.CurrentDirectory + "\\pt.zip", Environment.CurrentDirectory + "\\libraries", true);
                         Debug.Success("Extraction completed. Cleaning up...");
 
                         foreach (var name in new[] { "adb", "fastboot", "scrcpy" })
@@ -118,13 +118,13 @@ namespace GiacintFlasher
                         switch (args[3])
                         {
                             case "-unpkg":
-                                LibInstaller.DownloadFileAsync(args[2], Environment.CurrentDirectory + "\\lib.zip").Wait();
-                                ZipFile.ExtractToDirectory(Environment.CurrentDirectory + "\\lib.zip", Environment.CurrentDirectory, true);
-                                File.Delete(Environment.CurrentDirectory + "\\lib.zip");
+                                LibInstaller.DownloadFileAsync(args[2], Environment.CurrentDirectory + "\\libraries\\lib.zip").Wait();
+                                ZipFile.ExtractToDirectory(Environment.CurrentDirectory + "\\libraries\\lib.zip", Environment.CurrentDirectory + "\\libraries", true);
+                                File.Delete(Environment.CurrentDirectory + "\\libraries\\lib.zip");
                                 break;
                             case "-asname":
                                 if (args.Length < 5) { Debug.Error("Please provide a name for the library."); break; }
-                                LibInstaller.DownloadFileAsync(args[2], Environment.CurrentDirectory + $"\\{args[5]}").Wait();
+                                LibInstaller.DownloadFileAsync(args[2], Environment.CurrentDirectory + $"\\libraries\\{args[5]}").Wait();
                                 break;
                         }
 
