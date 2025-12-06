@@ -41,17 +41,18 @@ internal static class Program
 internal static class Flasher
 {
     internal static Config Config = new();
+    internal static bool UserInputLocked = false;
 
     internal static void WelcomeMessage()
     {
-        if (!Directory.Exists($"{Environment.CurrentDirectory}\\wms"))
-            Directory.CreateDirectory($"{Environment.CurrentDirectory}\\wms");
-        if (!File.Exists($"{Environment.CurrentDirectory}\\wms\\default.msg")) 
-            File.WriteAllText($"{Environment.CurrentDirectory}\\wms\\default.msg", Config.DefaultMessage);
+        if (!Directory.Exists($"{Environment.CurrentDirectory}\\user\\wms"))
+            Directory.CreateDirectory($"{Environment.CurrentDirectory}\\user\\wms");
+        if (!File.Exists($"{Environment.CurrentDirectory}\\user\\wms\\default.msg")) 
+            File.WriteAllText($"{Environment.CurrentDirectory}\\user\\wms\\default.msg", Config.DefaultMessage);
 
         string wm;
-        if (File.Exists($"{Environment.CurrentDirectory}\\wms\\{Config.CurrentWelcomeMessage}"))
-            wm = File.ReadAllText($"{Environment.CurrentDirectory}\\wms\\{Config.CurrentWelcomeMessage}");
+        if (File.Exists($"{Environment.CurrentDirectory}\\user\\wms\\{Config.CurrentWelcomeMessage}"))
+            wm = File.ReadAllText($"{Environment.CurrentDirectory}\\user\\wms\\{Config.CurrentWelcomeMessage}");
         else
         {
             Debug.Error($"Welcome message file not found, loading default welcome message. {Environment.CurrentDirectory}\\wms\\{Config.CurrentWelcomeMessage}");
@@ -70,9 +71,11 @@ internal static class Flasher
     {
         while (true)
         {
+            if (UserInputLocked) { Thread.Sleep(100); continue; }
+
             var input = Debug.Input();
             if (input == null) continue;
-
+            
             Command(input);
         }
     }
@@ -113,7 +116,7 @@ internal static class Flasher
                         break;
                     case "sc":
                     case "shortcut":
-                        var shortcutsDir = $"{Environment.CurrentDirectory}\\shortcuts";
+                        var shortcutsDir = $"{Environment.CurrentDirectory}\\user\\shortcuts";
                         if (fragArgs.Length < 2)
                         {
                             Debug.Warning("No shortcut subcommand provided. Use 'sc list' to view shortcuts.");
@@ -144,6 +147,7 @@ internal static class Flasher
                                     Debug.Info(Path.GetFileNameWithoutExtension(file));
                                 });
                                 break;
+                            case "$fw":
                             case "$framework":
                                 if (string.IsNullOrEmpty(fragArgs[2])) break;
                                 switch (fragArgs[2])
@@ -160,11 +164,23 @@ internal static class Flasher
                                     case "thread-sleep":
                                         Thread.Sleep(int.Parse(fragArgs[3]));
                                         break;
+                                    case "console-clear":
+                                        Console.Clear();
+                                        break;
+                                    case "console-preline":
+                                        Console.Write(StringHelper.ParseArg(fragArgs, 3));
+                                        break;
+                                    case "console-user-input-lock":
+                                        UserInputLocked = true;
+                                        break;
+                                    case "console-user-input-unlock":
+                                        UserInputLocked = false;
+                                        break;
                                     case "libplus-tryrunlib":
                                         LibPlus.TryRunLib(fragArgs[3], StringHelper.ParseArg(fragArgs, 4), ignoreErrors: true).Wait();
                                         break;
                                     case "libplus-tryrunlib@async":
-                                        _ = Task.Run(async () => { await LibPlus.TryRunLib(fragArgs[3], StringHelper.ParseArg(fragArgs, 4), ignoreErrors: true); });
+                                        _ = Task.Run(async() => { await LibPlus.TryRunLib(fragArgs[3], StringHelper.ParseArg(fragArgs, 4), ignoreErrors: true); });
                                         break;
                                 }
                                 break;
@@ -282,11 +298,6 @@ internal static class Flasher
                         }
                         switch (fragArgs[1])
                         {
-                            //case "disable-apps":
-                            //    if (fragArgs.Length < 3) { Debug.Warning("No provided app list"); break; }
-                            //    if (!File.Exists($"{Environment.CurrentDirectory}\\user\\applists\\{fragArgs[2]}.json"))
-
-                            //        break;
                             case "applist":
                                 Directory.CreateDirectory($"{Environment.CurrentDirectory}\\user\\applists");
                                 if (fragArgs.Length < 4) { Debug.Warning("No provided app list"); break; }
@@ -300,15 +311,19 @@ internal static class Flasher
                                 {
                                     case "del":
                                     case "delete":
-                                        cmd = "uninstall -k --user 0";
+                                        cmd = "shell pm uninstall -k --user 0";
                                         break;
                                     case "dis":
                                     case "disable":
-                                        cmd = "disable-user --user 0";
+                                        cmd = "shell pm disable-user --user 0";
                                         break;
                                     case "enl":
                                     case "enable":
-                                        cmd = "enable";
+                                        cmd = "shell pm enable";
+                                        break;
+                                    case "i":
+                                    case "install":
+                                        cmd = "install -r -g -t";
                                         break;
                                     default:
                                         Debug.Error("Not provided cmd for app list");

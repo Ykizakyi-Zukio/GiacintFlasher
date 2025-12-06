@@ -11,7 +11,7 @@ namespace GiacintFlasher.Lib.Services
             {
                 try
                 {
-                    Flasher.Command($"lib adb shell pm {cmd} {app}");
+                    Flasher.Command($"lib adb {cmd} {app}");
                     Debug.Success(app);
                 }
                 catch (Exception e)
