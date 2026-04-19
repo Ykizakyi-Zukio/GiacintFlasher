@@ -75,26 +75,22 @@ namespace GiacintFlasher.Lib.Services
             Console.ForegroundColor = ConsoleColor.White;
         }
 
-        internal static async Task InstallDynamic(string url, string path, string fileName = null)
+        internal static async Task InstallDynamic(string url, string path, string? fileName = null)
         {
             using var client = new HttpClient();
 
             using var response = await client.GetAsync(url, HttpCompletionOption.ResponseHeadersRead);
             response.EnsureSuccessStatusCode();
 
-            // Пытаемся достать имя файла из заголовков
             string? remoteFileName = response.Content.Headers.ContentDisposition?.FileName?.Trim('"');
 
-            // Если сервер не прислал имя, используем то, что в URL
             if (string.IsNullOrEmpty(remoteFileName))
             {
                 remoteFileName = fileName ?? Path.GetFileName(new Uri(url).LocalPath);
             }
 
-            // Создаём полный путь
             string fullPath = Path.Combine(path, remoteFileName);
 
-            // Загружаем файл
             await using (var stream = await response.Content.ReadAsStreamAsync())
             await using (var fileStream = File.Create(fullPath))
             {
