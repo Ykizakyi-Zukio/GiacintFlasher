@@ -59,8 +59,8 @@ internal static class Flasher
             wm = Config.DefaultMessage;
         }
 
-        Console.WriteLine(Config.MainColor);
-        Console.Write(StringHelper.ReplaceContexts(Config.AppContexts, wm));
+        //Console.WriteLine(Config.MainColor);
+        Console.Write(Config.MainColor + StringHelper.ReplaceContexts(Config.AppContexts, wm));
         if (LibPlus.FindLib("adb") == null)
             Debug.Warning("ADB library not found. Some commands may not work properly.");
         if (LibPlus.FindLib("fastboot") == null)
