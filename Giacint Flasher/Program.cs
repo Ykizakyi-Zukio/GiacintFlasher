@@ -16,7 +16,7 @@ internal static class Program
         if (LibPlus.FindLib("adb") != null)
         {
             Debug.Info("Starting adb server...");
-            _ = Task.Run(() => ProcessHelper.RunCommandAsync(LibPlus.FindLib("adb"), "start-server", false, 10000, true));
+            _ = Task.Run(() => ProcessHelper.RunCommandAsync(LibPlus.FindLib("adb"), "start-server", false, 8000, true));
         }    
 
         if (!string.IsNullOrEmpty(Flasher.Config.RunShortcutInStartup))
@@ -59,8 +59,8 @@ internal static class Flasher
             wm = Config.DefaultMessage;
         }
 
-        //Console.WriteLine(Config.MainColor);
-        Console.Write(Config.MainColor + StringHelper.ReplaceContexts(Config.AppContexts, wm));
+        Console.WriteLine(Config.MainColor);
+        Console.Write(StringHelper.ReplaceContexts(Config.AppContexts, wm));
         if (LibPlus.FindLib("adb") == null)
             Debug.Warning("ADB library not found. Some commands may not work properly.");
         if (LibPlus.FindLib("fastboot") == null)
@@ -124,6 +124,8 @@ internal static class Flasher
                         }
                         switch (fragArgs[1])
                         {
+                            case "new":
+                            case "add":
                             case "create":
 
                                 Console.WriteLine(">> SHORTCUT CREATION COMMAND, SPACE TO EXIT <<");
@@ -210,10 +212,8 @@ internal static class Flasher
                             Debug.Warning("No lib command provided.");
                             break;
                         }
-                        //if (Config.UseLibPlus)
-                        LibPlus.TryRunLib(fragArgs[1], string.Join(' ', fragArgs.Skip(2).ToArray())).Wait();
-                        //else
-                        //ProcessHelper.Init(args[1], string.Join(' ', fragArgs.Skip(2).ToArray())).Wait();
+                        
+                        LibPlus.TryRunLib(fragArgs[1], string.Join(' ', [.. fragArgs.Skip(2)])).Wait();
                         break;
                     case "lv":
                         if (fragArgs.Length < 2)
@@ -358,7 +358,7 @@ internal static class Flasher
         {
             Debug.Error($"Error executing command: {ex.Message}");
             if (Config.UseLogFile)
-                File.WriteAllText(Path.Combine(Environment.CurrentDirectory, "error.log"), ex.ToString());
+                File.AppendAllText(Path.Combine(Environment.CurrentDirectory, "error.log"), ex.ToString());
         }
     }
 }

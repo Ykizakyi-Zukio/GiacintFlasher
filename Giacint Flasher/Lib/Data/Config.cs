@@ -37,7 +37,6 @@ namespace GiacintFlasher.Lib.Data
             { "fb", "fastboot" },
             { "hd", "heimdall"}
         };
-        [JsonRequired]
         public Source[] LvSources = [];
         [JsonRequired]
         public bool UseLibPlus = true;
@@ -60,9 +59,9 @@ namespace GiacintFlasher.Lib.Data
 
         internal static Config Load()
         {
-            if (!File.Exists("config.json"))
-                File.WriteAllText("config.json", JsonConvert.SerializeObject(new Config(), Formatting.Indented));
-            return JsonConvert.DeserializeObject<Config>(File.ReadAllText("config.json"));
+            if (!File.Exists(AppContext.BaseDirectory + "\\config.json"))
+                File.WriteAllText(AppContext.BaseDirectory + "\\config.json", JsonConvert.SerializeObject(new Config(), Formatting.Indented));
+            return JsonConvert.DeserializeObject<Config>(File.ReadAllText(AppContext.BaseDirectory + "\\config.json"));
         }
         internal string ToJson() => JsonConvert.SerializeObject(this, Formatting.Indented);
     }
