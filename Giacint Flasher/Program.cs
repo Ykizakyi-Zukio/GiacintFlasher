@@ -45,10 +45,10 @@ internal static class Flasher
 
     internal static void WelcomeMessage()
     {
-        if (!Directory.Exists($"{Environment.CurrentDirectory}\\user\\wms"))
-            Directory.CreateDirectory($"{Environment.CurrentDirectory}\\user\\wms");
-        if (!File.Exists($"{Environment.CurrentDirectory}\\user\\wms\\default.msg")) 
-            File.WriteAllText($"{Environment.CurrentDirectory}\\user\\wms\\default.msg", Config.DefaultMessage);
+        var wmsDir = $"{Environment.CurrentDirectory}\\user\\wms";
+        if (!Directory.Exists(wmsDir)) Directory.CreateDirectory($"{Environment.CurrentDirectory}\\user\\wms");
+        var msgPath = $"{wmsDir}\\{Config.CurrentWelcomeMessage}";
+        if (!File.Exists(msgPath)) File.WriteAllText(msgPath, Config.DefaultMessage);
 
         string wm;
         if (File.Exists($"{Environment.CurrentDirectory}\\user\\wms\\{Config.CurrentWelcomeMessage}"))
